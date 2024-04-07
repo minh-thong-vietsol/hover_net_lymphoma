@@ -5,6 +5,9 @@
 cache/
 dataset/
 exp_output/
+models/weights/
+data/
+output/
 
 # checkpoint paths
 *.npz
