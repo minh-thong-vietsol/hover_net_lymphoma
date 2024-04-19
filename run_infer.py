@@ -80,7 +80,20 @@ from docopt import docopt
 
 #-------------------------------------------------------------------------------------------------------
 
+#Newly added, to check if gpu is available
+def is_gpu_available():
+    return torch.cuda.is_available()
+
+# Function to load the model
+def load_model(model_path):
+    if is_gpu_available():
+        return torch.load(model_path)
+    else:
+        return torch.load(model_path, map_location=torch.device('cpu'))
+
+
 if __name__ == '__main__':
+
     sub_cli_dict = {'tile' : tile_cli, 'wsi' : wsi_cli}
     args = docopt(__doc__, help=False, options_first=True, 
                     version='HoVer-Net Pytorch Inference v1.0')
@@ -115,11 +128,23 @@ if __name__ == '__main__':
 
     nr_gpus = torch.cuda.device_count()
     log_info('Detect #GPUS: %d' % nr_gpus)
+    
+    # if torch.cuda.is_available():
+    #     gpu_list = args.pop('--gpu')
+    #     os.environ['CUDA_VISIBLE_DEVICES'] = gpu_list
+    #     nr_gpus = torch.cuda.device_count()
+    #     log_info('Detect #GPUS: %d' % nr_gpus)
+    # else:
+    #     log_info('No GPU detected. Switching to CPU mode.')
+
+
 
     args = {k.replace('--', '') : v for k, v in args.items()}
     sub_args = {k.replace('--', '') : v for k, v in sub_args.items()}
     if args['model_path'] == None:
         raise Exception('A model path must be supplied as an argument with --model_path.')
+    
+    saved_state_dict = load_model(args["model_path"])
 
     nr_types = int(args['nr_types']) if int(args['nr_types']) > 0 else None
     method_args = {

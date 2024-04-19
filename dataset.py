@@ -32,8 +32,9 @@ class __Kumar(__AbstractDataset):
         return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
 
     def load_ann(self, path, with_type=False):
+    #def load_ann(self, path, with_type=True):
         # assumes that ann is HxW
-        assert not with_type, "Not support"
+        #assert not with_type, "Not support"
         ann_inst = sio.loadmat(path)["inst_map"]
         ann_inst = ann_inst.astype("int32")
         ann = np.expand_dims(ann_inst, -1)
